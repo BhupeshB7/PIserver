@@ -223,7 +223,9 @@ app.get("/api/randomData", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
+app.get("/", (req, res) => {
+  res.send("PIServer is started...");
+});
 // 
 // async function getUserTeam(userId, depth) {
 //   try {
