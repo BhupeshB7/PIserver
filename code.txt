@@ -1,0 +1,19 @@
+// cron.schedule(
+// <<<<<<< HEAD
+//   "03 06 * * *",
+// =======
+//   "20 01 * * *",
+// >>>>>>> 0c86e054625730b8ee26a40f2519be8c64a4122b
+//   async () => {
+//     try {
+//       // Reset dailyIncome for all users
+//       await User.updateMany({}, { $set: { dailyIncome: 0, teamIncomeValidation:0 } });
+//       console.log("Daily income reset successful");
+//     } catch (error) {
+//       console.error("Error resetting daily income:", error);
+//     }
+//   },
+//   {
+//     timezone: "Asia/Kolkata", // Set the timezone to IST
+//   }
+// );
