@@ -71,14 +71,14 @@ app.use("/api", require("./routes/contact"));
 app.use("/api", require("./routes/fundMove"));
 app.use("/userTasks", require("./routes/userTaskRoute"));
 // app.use("/api/gameProfile", require("./routes/GameRoutes"));
-app.use("/api/game", require("./routes/game"));
+// app.use("/api/game", require("./routes/game"));
 // app.use("/api", require("./routes/LiveGameUser"));
-app.use("/api", require("./routes/GameDeposit"));
+// app.use("/api", require("./routes/GameDeposit"));
 app.use("/api", require("./routes/image"));
 app.use("/api", require("./routes/WalletTransfer"));
 app.use("/api", require("./routes/changePassword"));
-app.use("/api/notice", require("./routes/notice"));
-app.use("/api/gift", require("./routes/GiftCode"));
+// app.use("/api/notice", require("./routes/notice"));
+// app.use("/api/gift", require("./routes/GiftCode"));
 app.use('/captcha', captchaRoutes);
 // app.use("/", sessionRoutes);
 // app.use("/three", sessionRoutes3);
@@ -89,70 +89,47 @@ app.use("/server",(req,res)=>{
 
 
 // Function to update users according to the specified logic
-async function updateUserLogic() {
-  try {
-    // Find users where teamIncomeValidation is greater than or equal to 200
-    const usersToUpdate = await User.find({ teamIncomeValidation: { $gte: 200 } });
+// async function updateUserLogic() {
+//   try {
+//     // Find users where teamIncomeValidation is greater than or equal to 200
+//     const usersToUpdate = await User.find({ teamIncomeValidation: { $gte: 200 } });
 
-    // Update selfIncome and teamIncomeValidation for each user
-    const promises = usersToUpdate.map(async (user) => {
-      if(user.package===500){
-        user.dailyIncome-=20;
-        user.selfIncome -= 20;
-        user.balance -= 20;
-        user.income -= 20;   
-        user.teamIncomeValidation = 0;
-      }
-     else if(user.package===1000){
-        user.dailyIncome-=50;
-        user.selfIncome -= 50;
-        user.balance -= 50;
-        user.income -= 50;   
-        user.teamIncomeValidation = 0;
-      }
-      await user.save();
-    });
+//     // Update selfIncome and teamIncomeValidation for each user
+//     const promises = usersToUpdate.map(async (user) => {
+//       if(user.package===500){
+//         user.dailyIncome-=20;
+//         user.selfIncome -= 20;
+//         user.balance -= 20;
+//         user.income -= 20;   
+//         user.teamIncomeValidation = 0;
+//       }
+//      else if(user.package===1000){
+//         user.dailyIncome-=50;
+//         user.selfIncome -= 50;
+//         user.balance -= 50;
+//         user.income -= 50;   
+//         user.teamIncomeValidation = 0;
+//       }
+//       await user.save();
+//     });
 
-    // Wait for all updates to complete
-    await Promise.all(promises);
+//     // Wait for all updates to complete
+//     await Promise.all(promises);
 
-    console.log('Users TeamIncomeValidation updated successfully');
-  } catch (err) {
-    console.error('Error updating users:', err);
-  }
-}
+//     console.log('Users TeamIncomeValidation updated successfully');
+//   } catch (err) {
+//     console.error('Error updating users:', err);
+//   }
+// }
 // {teamIncomeValidation:{$gte:150}}
 // Schedule the function to run at 11:23 PM every day
-cron.schedule('07 06 * * *', async () => {
-  // Call the updateUserLogic function
-  await updateUserLogic();
-}, {
-  timezone: "Asia/Kolkata" // Specify your timezone here
-});
+// cron.schedule('07 06 * * *', async () => {
+//   // Call the updateUserLogic function
+//   await updateUserLogic();
+// }, {
+//   timezone: "Asia/Kolkata" // Specify your timezone here
+// });
 
-// Fetch all users data using async/await
-// (async () => {
-//   try {
-//     const users = await GameProfile.find({});
-    
-//     // Convert users data to JSON format
-//     const jsonData = JSON.stringify(users, null, 2);
-    
-//     // Write the JSON data to a new file
-//     fs.writeFile('gameProfile.json', jsonData, (err) => {
-//       if (err) {
-//         console.error('Error writing file:', err);
-//         return;
-//       }
-//       console.log('Users data has been saved to users.json');
-//     });
-//   } catch (error) {
-//     console.error('Error fetching users:', error);
-//   }
-// })();
-
-// 3minutes Games Schema End
-//
 // Image upload routes
 const imageSchema = new mongoose.Schema({
   name: String,
@@ -200,106 +177,10 @@ app.delete("/delete/:id", async (req, res) => {
   }
 });
 // Pagination endpoint
-app.get("/api/randomData", async (req, res) => {
-  const perPage = 15;
-  const page = req.query.page || 1;
 
-  try {
-    const data = await RandomData.find({})
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * perPage)
-      .limit(perPage);
-
-    const totalDocuments = await RandomData.countDocuments();
-    const totalPages = Math.ceil(totalDocuments / perPage);
-
-    res.json({
-      data,
-      totalPages,
-      currentPage: page,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
 app.get("/", (req, res) => {
   res.send("PIServer is started...");
 });
-// 
-// async function getUserTeam(userId, depth) {
-//   try {
-//     if (depth <= 0) {
-//       // If depth reaches 0, return null to stop recursion
-//       return null;
-//     }
-
-//     const user = await User.findOne({ userId }).select('userId completed name mobile sponsorId').lean();
-
-//     if (!user) {
-//       return null;
-//     }
-
-//     const activeStatus = user.completed ? 'completed' : 'unCompleted';
-//     const teamStructure = {
-//       level: 6 - depth,
-//       userId: user.userId,
-//       status: activeStatus,
-//       name: user.name,
-//       sponsorId: user.sponsorId,
-//       mobile: user.mobile,
-//       downlineCount: 0,
-//       allUsersCount: 0,
-//       downline: [],
-//     };
-
-//     const downlineUsers = await User.find({ sponsorId: userId }).lean();
-//     const downlinePromises = downlineUsers.map((downlineUser) => getUserTeam(downlineUser.userId, depth - 1)); // Decrement depth in recursive call
-//     const downlineTeam = await Promise.all(downlinePromises);
-
-//     // Remove null elements from downlineTeam array
-//     const filteredDownlineTeam = downlineTeam.filter((item) => item !== null);
-
-//     teamStructure.downline = filteredDownlineTeam;
-//     teamStructure.downlineCount = filteredDownlineTeam.length;
-
-//     // Count number of all users and active users
-//     teamStructure.allUsersCount = filteredDownlineTeam.reduce((count, downline) => count + downline.allUsersCount + 1, 0);
-
-//     // console.info(teamStructure);
-
-//     return teamStructure;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
-
-// async function displayTeamByLevel(userId, depth) {
-//   try {
-//     const team = await getUserTeam(userId, depth);
-
-//     if (!team) {
-//       return;
-//     }
-
-//     // Display level 0 users first
-//     console.log(`Level ${team.level}:`);
-//     displayUsers(team);
-
-//     // Recursively display downline users by level
-//     team.downline.forEach((downlineUser) => displayTeamByLevel(downlineUser.userId, depth - 1));
-//   } catch (error) {
-//     console.error('Error fetching user team:', error);
-//   }
-// }
-
-// function displayUsers(user) {
-//   console.log(`Name: ${user.name}, Mobile: ${user.mobile}, Sponsor ID: ${user.sponsorId}, User ID: ${user.userId}, Level: ${user.level}, Status: ${user.status}`);
-// }
-// now,everything correct i want add onemore thing i.e. i have also another schema(userTask) in this userId status 
-// i also want return return time add taskStatus report complete or not based on userTaskStatus and userId(User from user schema)
-// Example usage:
-// displayTeamByLevel('PI21820725', 6);
 app.put('/users/withdrawalDone', async (req, res) => {
   try {
     // Update only users where is_active is true
