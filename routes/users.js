@@ -139,7 +139,7 @@ async function getUserTeamStructure(userId, depth) {
 
     const activeStatus = user.is_active ? 'active' : 'not active';
     const teamStructure = {
-      level: 5 - depth,
+      level: 6 - depth,
       userId: user.userId,
       status: activeStatus,
       downline: [],
