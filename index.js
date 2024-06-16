@@ -77,6 +77,7 @@ app.use("/userTasks", require("./routes/userTaskRoute"));
 app.use("/api", require("./routes/image"));
 app.use("/api", require("./routes/WalletTransfer"));
 app.use("/api", require("./routes/changePassword"));
+app.use("/api", require("./routes/DailyIncome"));
 // app.use("/api/notice", require("./routes/notice"));
 // app.use("/api/gift", require("./routes/GiftCode"));
 app.use('/captcha', captchaRoutes);
