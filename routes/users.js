@@ -113,7 +113,7 @@ router.get('/teamStructure/:userId', async (req, res) => {
     res.json(cachedData);
   } else {
     try {
-      const teamStructure = await getUserTeamStructure(userId, 5);
+      const teamStructure = await getUserTeamStructure(userId, 6);
       const usersByLevel = countUsersByLevel(teamStructure);
       cache.set(userId, usersByLevel); // Cache the data
       res.json(usersByLevel);
