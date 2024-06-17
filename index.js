@@ -79,7 +79,7 @@ app.use("/api", require("./routes/WalletTransfer"));
 app.use("/api", require("./routes/changePassword"));
 app.use("/api", require("./routes/DailyIncome"));
 // app.use("/api/notice", require("./routes/notice"));
-// app.use("/api/gift", require("./routes/GiftCode"));
+app.use("/api/gift", require("./routes/GiftCode"));
 app.use('/captcha', captchaRoutes);
 // app.use("/", sessionRoutes);
 // app.use("/three", sessionRoutes3);
