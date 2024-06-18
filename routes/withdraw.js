@@ -119,21 +119,42 @@ router.post("/user/:userId", async (req, res) => {
           .status(400)
           .json({ error: "Minimum Two Direct for Withdrawal" });
       }
-      if (user.package === 999 || user.package === 1000|| user.package ===500 || user.package ===499) {
+      // if (user.package === 999 || user.package === 1000|| user.package ===500 || user.package ===499) {
+      //   const downlineUsers = await User.find({
+      //     sponsorId: user.userId,
+      //     is_active: true,
+      //   }).select('package');
+      
+      //   const totalPackageValue = downlineUsers.reduce((total, downlineUser) => total + downlineUser.package, 0);
+      
+      //   if (totalPackageValue < 2000) {
+      //     return res.status(400).json({
+      //       error: "You should have a total package value of at least 2000 for withdrawal.",
+      //     });
+      //   }
+      // }
+      if ([999, 1000, 500, 499].includes(user.package)) {
         const downlineUsers = await User.find({
-          sponsorId: user.userId,
-          is_active: true,
+            sponsorId: user.userId,
+            is_active: true,
         }).select('package');
-      
+        
         const totalPackageValue = downlineUsers.reduce((total, downlineUser) => total + downlineUser.package, 0);
-      
-        if (totalPackageValue < 2000) {
-          return res.status(400).json({
-            error: "You should have a total package value of at least 2000 for withdrawal.",
-          });
+    
+        let requiredPackageValue;
+        if (user.package === 1000 || user.package === 999) {
+            requiredPackageValue = 2000;
+        } else if (user.package === 500 || user.package === 499) {
+            requiredPackageValue = 1000;
         }
-      }
-      
+    
+        if (totalPackageValue < requiredPackageValue) {
+            return res.status(400).json({
+                error: `You should have a total package value of at least ${requiredPackageValue} for withdrawal.`,
+            });
+        }
+    }
+    
       // Check if user balance is sufficient for the withdrawal
       if (user.balance < amount) {
         return res.status(400).json({ error: "Insufficient balance" });
