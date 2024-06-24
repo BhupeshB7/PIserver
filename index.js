@@ -9,12 +9,12 @@ const http = require("http");
 const dotenv = require("dotenv");
 const cloudinaryConfig = require("./cloudinaryConfig");
 const User = require("./models/User");
-const fs = require('fs'); // Import the file system module
+const fs = require("fs"); // Import the file system module
 const taskRoutes = require("./routes/taskRoute");
 // const sessionRoutes = require("./routes/sessionRoutes");
 // const sessionRoutes3 = require("./routes/threeMinuteRoutes");
 const GameProfile = require("./models/GameProfile");
-const captchaRoutes = require('./routes/captchaRoutes');
+const captchaRoutes = require("./routes/captchaRoutes");
 
 // Load environment variables from .env file
 dotenv.config();
@@ -30,7 +30,6 @@ mongoose
 
 const app = express();
 const server = http.createServer(app);
-
 
 // Middleware
 // app.use(cors());
@@ -80,14 +79,13 @@ app.use("/api", require("./routes/changePassword"));
 app.use("/api", require("./routes/DailyIncome"));
 // app.use("/api/notice", require("./routes/notice"));
 app.use("/api/gift", require("./routes/GiftCode"));
-app.use('/captcha', captchaRoutes);
+app.use("/captcha", captchaRoutes);
 // app.use("/", sessionRoutes);
 // app.use("/three", sessionRoutes3);
-app.use("/server",(req,res)=>{
-  res.json({message:"Server Started!"});
-})
+app.use("/server", (req, res) => {
+  res.json({ message: "Server Started!" });
+});
 // Schedule daily income reset using cron
-
 
 // Function to update users according to the specified logic
 // async function updateUserLogic() {
@@ -101,14 +99,14 @@ app.use("/server",(req,res)=>{
 //         user.dailyIncome-=20;
 //         user.selfIncome -= 20;
 //         user.balance -= 20;
-//         user.income -= 20;   
+//         user.income -= 20;
 //         user.teamIncomeValidation = 0;
 //       }
 //      else if(user.package===1000){
 //         user.dailyIncome-=50;
 //         user.selfIncome -= 50;
 //         user.balance -= 50;
-//         user.income -= 50;   
+//         user.income -= 50;
 //         user.teamIncomeValidation = 0;
 //       }
 //       await user.save();
@@ -182,11 +180,21 @@ app.delete("/delete/:id", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("PIServer is started...");
 });
-app.put('/users/withdrawalDone', async (req, res) => {
+app.put("/users/AccountprofileUpdate", async (req, res) => {
   try {
-    // Update only users where is_active is true
-    const result = await User.updateMany({ is_active: true }, { $set: { withdrawalDone: true } });
-    res.json({ message: 'Active users deactivated successfully', modifiedCount: result.modifiedCount });
+    const usersToUpdate = await User.find({
+      $expr: { $ne: ["$name", "$accountHolderName"] },
+    });
+    const userIdsToUpdate = usersToUpdate.map((user) => user._id);
+    const result = await User.updateMany(
+      { _id: { $in: userIdsToUpdate } },
+      { $set: { accountHolderName: "" } }
+    );
+
+    res.json({
+      message: "Users Account holder name updated where necessary",
+      modifiedCount: result.modifiedCount,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

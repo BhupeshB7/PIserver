@@ -407,7 +407,8 @@ router.post('/profileUpdate',auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     // const user = await User.findById({_id : id});
-
+    //  console.log(user);
+    console.log(req.body.accountHolderName);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -416,8 +417,17 @@ router.post('/profileUpdate',auth, async (req, res) => {
       user.name = req.body.name.trim();
     }
     if (req.body.accountHolderName) {
-      user.accountHolderName = req.body.accountHolderName.trim();
+      const accountName = await User.findById(req.user.id);
+      const trimmedAccountHolderName = req.body.accountHolderName.trim();
+      const trimmedAccountName = accountName.name.trim();
+      // console.log(`Account name from database: "${trimmedAccountName}"`);
+      // console.log(`Account holder name from request: "${trimmedAccountHolderName}"`);
+      if (trimmedAccountName !== trimmedAccountHolderName) {
+        return res.status(400).json({ error: 'User name and Account Holder name should be the same' });
+      }
+      user.accountHolderName = trimmedAccountHolderName;
     }
+    
 
     if (req.body.bio) {
       user.bio = req.body.bio.trim();
@@ -456,14 +466,14 @@ if (req.body.aadhar) {
       }
       user.aadhar = aadhar;
     }
-    // if (req.body.email) {
-    //   const email = req.body.email.trim().toLowerCase();
-    //   const emailExists = await User.findOne({ email });
-    //   if (emailExists && emailExists._id.toString() !== user._id.toString()) {
-    //     return res.status(400).json({ error: 'Email already exists' });
-    //   }
-    //   user.email = email;
-    // }
+    if (req.body.email) {
+      const email = req.body.email.trim().toLowerCase();
+      const emailExists = await User.findOne({ email });
+      if (emailExists && emailExists._id.toString() !== user._id.toString()) {
+        return res.status(400).json({ error: 'Email already exists' });
+      }
+      user.email = email;
+    }
     user.updateCount += 1;
 
     // Mark details as updated
@@ -474,7 +484,7 @@ if (req.body.aadhar) {
 
     res.json({ message: 'Profile updated successfully' });
   } catch (error) {
-    // console.error(error.message);
+    console.error(error.message);
     res.status(500).send('Server Error for updation');
   }
 });
