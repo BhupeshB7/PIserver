@@ -38,6 +38,7 @@ app.use(
     // origin:"https://powerfullindia.com",
     // origin:"https://www.powerfullindia.com",
     origin: "*",
+    origin: "https://www.powerfullindia.com",
     // origin:"http://localhost:3000",
   })
 );
@@ -180,6 +181,39 @@ app.delete("/delete/:id", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("PIServer is started...");
 });
+app.put("/users/accountUpdate", async (req, res) =>{
+  try {
+    const result = await User.updateMany({is_active: true},{$set:{updateCount:1}});
+    res.json({message: "Users Account holder name updated where necessary", modifiedCount: result.modifiedCount});
+  } catch (error) {
+    console.error(error);
+  }
+})
+app.put("/users/profileUpdate", async (req, res) => {
+  try {
+    const { userId, updateCount } = req.body;
+
+    if (!userId || typeof updateCount !== 'number') {
+      return res.status(400).json({ message: "Invalid request parameters" });
+    }
+
+    const result = await User.findOneAndUpdate(
+      { userId: userId },
+      { $set: { updateCount: updateCount } },
+      { new: true }  // returns the updated document
+    );
+
+    if (result) {
+      res.json({ message: "User Detail updated where necessary", modifiedCount: 1 });  
+    } else {   
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.put("/users/AccountprofileUpdate", async (req, res) => {
   try {
     const usersToUpdate = await User.find({
